@@ -21,17 +21,18 @@ class TsinjoControllerIT extends FacadeIT {
 
   @Test
   void donate_then_read_donations() {
-    donationCreationFormConsumer.accept(
-        new DonationCreationForm("lou@cute.dev", "Lou", "Andria", "orangeRef1"));
-    donationCreationFormConsumer.accept(
-        new DonationCreationForm("lou@cute.dev", null, null, "orangeRef2"));
+    var ref1 = randomUUID().toString();
+    var ref2 = randomUUID().toString();
+    var newEmail = randomUUID().toString() + "@cude.dev";
+    donationCreationFormConsumer.accept(new DonationCreationForm(newEmail, "Lou", "Andria", ref1));
+    donationCreationFormConsumer.accept(new DonationCreationForm(newEmail, null, null, ref2));
 
     var events = eventRepository.findAllByOrderByCreationInstantDesc();
     assertEquals(2, events.size());
     var payment1 =
         events.stream()
             .map(Event::getPayment)
-            .filter(p -> "orangeRef1".equals(p.pspId()))
+            .filter(p -> ref1.equals(p.pspId()))
             .findFirst()
             .get();
     assertEquals(VERIFYING, payment1.status());
@@ -39,7 +40,7 @@ class TsinjoControllerIT extends FacadeIT {
     assertNull(payment1.pspLastVerificationInstant());
     var user =
         events.stream()
-            .filter(e -> "orangeRef2".equals(e.getPayment().pspId()))
+            .filter(e -> ref2.equals(e.getPayment().pspId()))
             .map(Event::getUser)
             .findFirst()
             .get();
@@ -53,7 +54,7 @@ class TsinjoControllerIT extends FacadeIT {
     donationCreationFormConsumer.accept(
         new DonationCreationForm("lou@cute.dev", "Lou", "Andria", pspId));
     assertThrows(
-        Exception.class,
+        IllegalArgumentException.class,
         () ->
             donationCreationFormConsumer.accept(
                 new DonationCreationForm("lou@cute.dev", null, null, pspId)));

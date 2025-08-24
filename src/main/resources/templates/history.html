@@ -2,19 +2,35 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tsinjo - Historique</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="min-h-screen bg-gray-100 font-[Poppins] text-gray-700">
 
-<body class="h-screen bg-gray-100" >
 <div th:replace="fragments/header :: header"></div>
 
-<h2 class="text-2xl font-bold text-[#3F2F6A] mb-6">Fonds</h2>
-<p th:text="${fund.toString()}"/>
+<div class="container mx-auto px-4 py-8">
 
-<h2 class="text-2xl font-bold text-[#3F2F6A] mb-6">Historique</h2>
-<ul>
-    <li th:each="event : ${events}" th:text="${event.toString()}" th:style="'color: ' + ${event.color()}"></li>
-</ul>
+    <!-- Fonds -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 justify-center max-w-4xl mx-auto">
+        <div class="bg-white rounded-xl shadow-md p-3 gap-4 hover:shadow-lg transition w-[280px] h-36 flex flex-col justify-center items-center">
+            <h3 class="text-[#6a0dad] font-semibold mb-1 text-xl">Donations Confirmées</h3>
+            <p class="text-2xl font-extrabold text-purple-700"
+               th:text="${fund.allConfirmedDonations != null ? #numbers.formatInteger(fund.allConfirmedDonations, 0, 'COMMA') + ' Ar' : '--'}">0 Ar</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-3 gap-4 hover:shadow-lg transition w-[280px] h-36 flex flex-col justify-center items-center">
+            <h3 class="text-[#6a0dad] font-semibold mb-1 text-xl">Aides Confirmées</h3>
+            <p class="text-2xl font-extrabold text-purple-700"
+               th:text="${fund.allConfirmedHelps != null ? #numbers.formatInteger(fund.allConfirmedHelps, 0, 'COMMA') + ' Ar' : '--'}">0 Ar</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-3 gap-4 hover:shadow-lg transition w-[280px] h-36 flex flex-col justify-center items-center">
+            <h3 class="text-[#6a0dad] font-semibold mb-1 text-xl">Fonds Restants</h3>
+            <p class="text-2xl font-extrabold text-purple-700"
+               th:text="${fund.confirmedRemainingFund != null ? #numbers.formatInteger(fund.confirmedRemainingFund, 0, 'COMMA') + ' Ar' : '--'}">0 Ar</p>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

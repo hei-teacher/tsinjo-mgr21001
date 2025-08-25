@@ -13,7 +13,7 @@
 <div class="container mx-auto px-4 py-8">
 
     <!-- Fonds -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 justify-center max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 justify-center max-w-4xl mx-auto place-items-center">
         <div class="bg-white rounded-xl shadow-md p-3 gap-4 hover:shadow-lg transition w-[280px] h-36 flex flex-col justify-center items-center">
             <h3 class="text-[#16163f] font-semibold mb-1 text-xl">Donations Confirmées</h3>
             <p class="text-2xl font-extrabold text-[#9933cc]"
@@ -35,9 +35,13 @@
     <h2 class="text-2xl font-bold text-[#16163f] mb-6 text-center">Historique des donations</h2>
     <div class="space-y-4">
         <div th:each="event : ${events}"
-             class="flex flex-col md:flex-row md:items-center justify-between bg-white rounded-lg shadow p-5 border-l-4 border-[#9933cc] hover:shadow-lg hover:scale-[1.01] transition">
+             th:class="${event.event.payment.status.name() == 'VERIFYING' or event.event.payment.status.name() == 'CONFIRMED' ?
+               'flex flex-col md:flex-row md:items-center justify-between rounded-lg shadow p-5 border-l-4 border-[#9933cc] hover:shadow-lg hover:scale-[1.01] transition bg-white' :
+            (event.event.payment.status.name() == 'REFUSED' ?
+               'flex flex-col md:flex-row md:items-center justify-between rounded-lg shadow p-5 border-l-4 border-[#9933cc] hover:shadow-lg hover:scale-[1.01] transition bg-red-50' :
+               '')}">
 
-            <!-- Date + Montant -->
+        <!-- Date + Montant -->
             <div class="flex flex-col md:flex-row md:items-center justify-around w-full md:w-1/3 mb-3 md:mb-0 text-[0.95rem]">
                 <!-- Date -->
                 <p class="text-gray-500 min-w-[110px] text-center"
@@ -59,9 +63,13 @@
                 <span class="bg-purple-100 text-gray-500 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap"
                       th:text="'Payé via ' + ${event.event.payment.pspType}">Méthode</span>
 
-                <span th:classappend="${event.event.payment.status.name() == 'CONFIRMED'} ? 'bg-[#9933cc] text-white' : 'bg-purple-100 text-[#9933cc]'"
-                      class="inline-block w-[120px] text-xs font-bold px-3 py-1 rounded-full text-center"
-                      th:text="${event.event.payment.status.name() == 'CONFIRMED' ? 'Succès' : 'En vérification'}">
+                <span th:class="${event.event.payment.status.name() == 'CONFIRMED' ?
+                                'inline-block w-[120px] text-xs font-bold px-3 py-1 rounded-full text-center bg-[#9933cc] text-white' :
+                             (event.event.payment.status.name() == 'VERIFYING' ?
+                                'inline-block w-[120px] text-xs font-bold px-3 py-1 rounded-full text-center bg-gray-200 text-[#9933cc]' :
+                                'inline-block w-[120px] text-xs font-bold px-3 py-1 rounded-full text-center bg-red-200 text-red-700')}"
+                      th:text="${event.event.payment.status.name() == 'CONFIRMED' ? 'Succès' :
+                           (event.event.payment.status.name() == 'VERIFYING' ? 'En vérification' : 'Refusé')}">
                     Statut
                 </span>
             </div>

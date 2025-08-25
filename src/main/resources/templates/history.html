@@ -15,27 +15,27 @@
     <!-- Fonds -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 justify-center max-w-4xl mx-auto">
         <div class="bg-white rounded-xl shadow-md p-3 gap-4 hover:shadow-lg transition w-[280px] h-36 flex flex-col justify-center items-center">
-            <h3 class="text-[#6a0dad] font-semibold mb-1 text-xl">Donations Confirmées</h3>
-            <p class="text-2xl font-extrabold text-purple-700"
+            <h3 class="text-[#16163f] font-semibold mb-1 text-xl">Donations Confirmées</h3>
+            <p class="text-2xl font-extrabold text-[#9933cc]"
                th:text="${fund.allConfirmedDonations != null ? #numbers.formatInteger(fund.allConfirmedDonations, 0, 'COMMA') + ' Ar' : '--'}">0 Ar</p>
         </div>
         <div class="bg-white rounded-xl shadow-md p-3 gap-4 hover:shadow-lg transition w-[280px] h-36 flex flex-col justify-center items-center">
-            <h3 class="text-[#6a0dad] font-semibold mb-1 text-xl">Aides Confirmées</h3>
-            <p class="text-2xl font-extrabold text-purple-700"
+            <h3 class="text-[#16163f] font-semibold mb-1 text-xl">Aides Confirmées</h3>
+            <p class="text-2xl font-extrabold text-[#9933cc]"
                th:text="${fund.allConfirmedHelps != null ? #numbers.formatInteger(fund.allConfirmedHelps, 0, 'COMMA') + ' Ar' : '--'}">0 Ar</p>
         </div>
         <div class="bg-white rounded-xl shadow-md p-3 gap-4 hover:shadow-lg transition w-[280px] h-36 flex flex-col justify-center items-center">
-            <h3 class="text-[#6a0dad] font-semibold mb-1 text-xl">Fonds Restants</h3>
-            <p class="text-2xl font-extrabold text-purple-700"
+            <h3 class="text-[#16163f] font-semibold mb-1 text-xl">Fonds Restants</h3>
+            <p class="text-2xl font-extrabold text-[#9933cc]"
                th:text="${fund.confirmedRemainingFund != null ? #numbers.formatInteger(fund.confirmedRemainingFund, 0, 'COMMA') + ' Ar' : '--'}">0 Ar</p>
         </div>
     </div>
 
     <!-- Historique -->
-    <h2 class="text-2xl font-bold text-[#3F2F6A] mb-6 text-center">Historique des donations</h2>
+    <h2 class="text-2xl font-bold text-[#16163f] mb-6 text-center">Historique des donations</h2>
     <div class="space-y-4">
         <div th:each="event : ${events}"
-             class="flex flex-col md:flex-row md:items-center justify-between bg-white rounded-lg shadow p-5 border-l-4 border-[#6a0dad] hover:shadow-lg hover:scale-[1.01] transition">
+             class="flex flex-col md:flex-row md:items-center justify-between bg-white rounded-lg shadow p-5 border-l-4 border-[#9933cc] hover:shadow-lg hover:scale-[1.01] transition">
 
             <!-- Date + Montant -->
             <div class="flex flex-col md:flex-row md:items-center justify-around w-full md:w-1/3 mb-3 md:mb-0 text-[0.95rem]">
@@ -56,10 +56,10 @@
 
             <!-- Méthode + Statut -->
             <div class="flex items-center justify-around gap-3 w-full md:w-1/3 text-[0.95rem] border border-transparent">
-                <span class="bg-purple-100 text-[#6a0dad] text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap"
+                <span class="bg-purple-100 text-gray-500 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap"
                       th:text="'Payé via ' + ${event.event.payment.pspType}">Méthode</span>
 
-                <span th:classappend="${event.event.payment.status.name() == 'CONFIRMED'} ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-700'"
+                <span th:classappend="${event.event.payment.status.name() == 'CONFIRMED'} ? 'bg-[#9933cc] text-white' : 'bg-purple-100 text-[#9933cc]'"
                       class="inline-block w-[120px] text-xs font-bold px-3 py-1 rounded-full text-center"
                       th:text="${event.event.payment.status.name() == 'CONFIRMED' ? 'Succès' : 'En vérification'}">
                     Statut

@@ -40,21 +40,22 @@ class EventServiceIT extends FacadeIT {
     var ref1 = generateValidPspId();
     var newEmail = randomUUID() + "@cute.dev";
 
+    // First mock: return VERIFYING status for creation
     var verifyingVolaPayment = aVolaPayment(VERIFYING, ref1);
     when(volaClientMock.create(any(), eq(ref1), eq(newEmail))).thenReturn(verifyingVolaPayment);
     donationCreationFormConsumer.accept(new DonationCreationForm("Lou", "Andria", ref1), newEmail);
 
+    // Second mock: return VERIFYING status for first resolution attempt
     when(volaClientMock.get(any(), any(), any())).thenReturn(verifyingVolaPayment);
     var events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
-    System.out.println("First status: " + events.get(0).getPayment().status()); // Debug
     assertEquals(PaymentStatus.VERIFYING, events.get(0).getPayment().status());
 
+    // Third mock: return SUCCEEDED status for second resolution attempt
     var succeededVolaPayment = aVolaPayment(SUCCEEDED, ref1);
     when(volaClientMock.get(any(), any(), any())).thenReturn(succeededVolaPayment);
     events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
-    System.out.println("Second status: " + events.get(0).getPayment().status()); // Debug
     assertEquals(CONFIRMED, events.get(0).getPayment().status());
   }
 

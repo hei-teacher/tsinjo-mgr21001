@@ -32,6 +32,7 @@ class EventServiceIT extends FacadeIT {
   private String generateValidPspId() {
     return "MP250811.1103.C" + String.format("%05d", Math.round(Math.random() * 99999));
   }
+
   @Transactional
   @DirtiesContext
   @Test
@@ -46,12 +47,14 @@ class EventServiceIT extends FacadeIT {
     when(volaClientMock.get(any(), any(), any())).thenReturn(verifyingVolaPayment);
     var events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
+    System.out.println("First status: " + events.get(0).getPayment().status()); // Debug
     assertEquals(PaymentStatus.VERIFYING, events.get(0).getPayment().status());
 
     var succeededVolaPayment = aVolaPayment(SUCCEEDED, ref1);
     when(volaClientMock.get(any(), any(), any())).thenReturn(succeededVolaPayment);
     events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
+    System.out.println("Second status: " + events.get(0).getPayment().status()); // Debug
     assertEquals(CONFIRMED, events.get(0).getPayment().status());
   }
 

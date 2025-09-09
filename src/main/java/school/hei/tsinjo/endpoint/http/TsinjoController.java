@@ -46,7 +46,32 @@ public class TsinjoController {
   }
 
   @GetMapping("/donate")
-  public String donate() {
+  public String donate(Authentication authentication, Model model) {
+    var defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+    var email = defaultOAuth2User.getAttributes().get("email").toString();
+
+    var events = eventService.findAllWithPaymentResolution();
+    var thEvents = events.stream().map(ThEvent::new).toList();
+
+    var lastEvent =
+        thEvents.stream()
+            .filter(e -> e.event().getUser().getEmail().equals(email))
+            .reduce((first, second) -> second) // dernier event de l'utilisateur
+            .orElse(null);
+
+    DonationCreationForm donationForm;
+    if (lastEvent != null) {
+      donationForm =
+          new DonationCreationForm(
+              lastEvent.event().getUser().getFirstName(),
+              lastEvent.event().getUser().getLastName(),
+              "" // pspId toujours vide
+              );
+    } else {
+      donationForm = new DonationCreationForm("", "", "");
+    }
+
+    model.addAttribute("donationForm", donationForm);
     return "donate";
   }
 

@@ -28,7 +28,7 @@ class EventServiceIT extends FacadeIT {
   @MockBean VolaClient volaClientMock;
 
   private String generateValidPspId() {
-    return "MP250811.1103.C" + String.format("%05d", (int) (Math.random() * 99999));
+    return "MP250811.1103.C" + String.format("%05d", Math.round(Math.random() * 99999));
   }
 
   @Test
@@ -40,13 +40,11 @@ class EventServiceIT extends FacadeIT {
     when(volaClientMock.create(any(), eq(ref1), eq(newEmail))).thenReturn(verifyingVolaPayment);
     donationCreationFormConsumer.accept(new DonationCreationForm("Lou", "Andria", ref1), newEmail);
 
-    // Just after creation, we simulate that Vola still replies with VERIFYING
     when(volaClientMock.get(any(), any(), any())).thenReturn(verifyingVolaPayment);
     var events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
     assertEquals(PaymentStatus.VERIFYING, events.get(0).getPayment().status());
 
-    // Now we simulate Vola replies with SUCCEEDED
     var succeededVolaPayment = aVolaPayment(SUCCEEDED);
     when(volaClientMock.get(any(), any(), any())).thenReturn(succeededVolaPayment);
     events = eventService.findAllWithPaymentResolution();

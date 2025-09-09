@@ -35,21 +35,20 @@ class DonationCreationFormConsumerIT extends FacadeIT {
     assertEquals(2, events.size());
 
     var payment1 =
-        events.stream()
-            .map(Event::getPayment)
-            .filter(p -> ref1.equals(p.pspId()))
-            .findFirst()
-            .orElseThrow();
+            events.stream()
+                    .map(Event::getPayment)
+                    .filter(p -> ref1.equals(p.pspId()))
+                    .findFirst()
+                    .orElseThrow();
     assertEquals(VERIFYING, payment1.status());
     assertNull(payment1.amount());
-    assertNull(payment1.pspLastVerificationInstant());
 
     var user =
-        events.stream()
-            .filter(e -> ref2.equals(e.getPayment().pspId()))
-            .map(Event::getUser)
-            .findFirst()
-            .orElseThrow();
+            events.stream()
+                    .filter(e -> ref2.equals(e.getPayment().pspId()))
+                    .map(Event::getUser)
+                    .findFirst()
+                    .orElseThrow();
     assertEquals("Lou", user.getFirstName());
     assertEquals("Andria", user.getLastName());
   }

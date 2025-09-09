@@ -15,7 +15,7 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import school.hei.tsinjo.conf.FacadeIT;
 import school.hei.tsinjo.endpoint.http.model.DonationCreationForm;
 import school.hei.tsinjo.model.PaymentStatus;
@@ -30,45 +30,42 @@ class EventServiceIT extends FacadeIT {
   @MockBean VolaClient volaClientMock;
 
   private String generateValidPspId() {
-    return "MP250811.1103.C" + String.format("%05d", Math.round(Math.random() * 99999));
+    return "MP250811.1103.C" + String.format("%05d", (int) (Math.random() * 99999));
   }
 
   @Transactional
-  @DirtiesContext
+  @Rollback
   @Test
   void create_then_confirm() {
     var ref1 = generateValidPspId();
     var newEmail = randomUUID() + "@cute.dev";
 
-    // First mock: return VERIFYING status for creation
-    var verifyingVolaPayment = aVolaPayment(VERIFYING, ref1);
+    var verifyingVolaPayment = aVolaPayment(VERIFYING);
     when(volaClientMock.create(any(), eq(ref1), eq(newEmail))).thenReturn(verifyingVolaPayment);
     donationCreationFormConsumer.accept(new DonationCreationForm("Lou", "Andria", ref1), newEmail);
 
-    // Second mock: return VERIFYING status for first resolution attempt
+    // Just after creation, we simulate that Vola still replies with VERIFYING
     when(volaClientMock.get(any(), any(), any())).thenReturn(verifyingVolaPayment);
     var events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
     assertEquals(PaymentStatus.VERIFYING, events.get(0).getPayment().status());
 
-    // Third mock: return SUCCEEDED status for second resolution attempt
-    var succeededVolaPayment = aVolaPayment(SUCCEEDED, ref1);
+    // Now we simulate Vola replies with SUCCEEDED
+    var succeededVolaPayment = aVolaPayment(SUCCEEDED);
     when(volaClientMock.get(any(), any(), any())).thenReturn(succeededVolaPayment);
     events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
     assertEquals(CONFIRMED, events.get(0).getPayment().status());
   }
 
-  private static Payment aVolaPayment(VerificationStatusEnum status, String pspId) {
+  private static Payment aVolaPayment(VerificationStatusEnum status) {
     var verifyingVolaPspPayment = new PspPayment();
-    verifyingVolaPspPayment.setId(randomUUID().toString()); // Ensure unique ID
+    verifyingVolaPspPayment.setId(randomUUID().toString());
     verifyingVolaPspPayment.setPspType(ORANGE_MONEY);
-    verifyingVolaPspPayment.setId(pspId); // Set the actual PSP ID
 
     var volaPaymentMock = mock(Payment.class);
     when(volaPaymentMock.getVerificationStatus()).thenReturn(status);
     when(volaPaymentMock.getPspPayment()).thenReturn(verifyingVolaPspPayment);
-    when(volaPaymentMock.getId()).thenReturn(randomUUID().toString()); // Ensure unique payment ID
     return volaPaymentMock;
   }
 }

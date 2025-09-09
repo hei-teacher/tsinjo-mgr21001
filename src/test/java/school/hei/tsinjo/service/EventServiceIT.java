@@ -36,7 +36,7 @@ class EventServiceIT extends FacadeIT {
     var ref1 = generateValidPspId();
     var newEmail = randomUUID() + "@cute.dev";
 
-    var verifyingVolaPayment = aVolaPayment(VERIFYING);
+    var verifyingVolaPayment = aVolaPayment(VERIFYING, ref1);
     when(volaClientMock.create(any(), eq(ref1), eq(newEmail))).thenReturn(verifyingVolaPayment);
     donationCreationFormConsumer.accept(new DonationCreationForm("Lou", "Andria", ref1), newEmail);
 
@@ -45,21 +45,23 @@ class EventServiceIT extends FacadeIT {
     assertEquals(1, events.size());
     assertEquals(PaymentStatus.VERIFYING, events.get(0).getPayment().status());
 
-    var succeededVolaPayment = aVolaPayment(SUCCEEDED);
+    var succeededVolaPayment = aVolaPayment(SUCCEEDED, ref1);
     when(volaClientMock.get(any(), any(), any())).thenReturn(succeededVolaPayment);
     events = eventService.findAllWithPaymentResolution();
     assertEquals(1, events.size());
     assertEquals(CONFIRMED, events.get(0).getPayment().status());
   }
 
-  private static Payment aVolaPayment(VerificationStatusEnum status) {
+  private static Payment aVolaPayment(VerificationStatusEnum status, String pspId) {
     var verifyingVolaPspPayment = new PspPayment();
-    verifyingVolaPspPayment.setId(randomUUID().toString());
+    verifyingVolaPspPayment.setId(randomUUID().toString()); // Ensure unique ID
     verifyingVolaPspPayment.setPspType(ORANGE_MONEY);
+    verifyingVolaPspPayment.setId(pspId); // Set the actual PSP ID
 
     var volaPaymentMock = mock(Payment.class);
     when(volaPaymentMock.getVerificationStatus()).thenReturn(status);
     when(volaPaymentMock.getPspPayment()).thenReturn(verifyingVolaPspPayment);
+    when(volaPaymentMock.getId()).thenReturn(randomUUID().toString()); // Ensure unique payment ID
     return volaPaymentMock;
   }
 }

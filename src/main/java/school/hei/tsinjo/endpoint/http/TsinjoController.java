@@ -12,6 +12,7 @@ import school.hei.tsinjo.endpoint.http.model.DonationCreationForm;
 import school.hei.tsinjo.endpoint.http.model.ThEvent;
 import school.hei.tsinjo.endpoint.http.model.ThFund;
 import school.hei.tsinjo.service.DonationCreationFormConsumer;
+import school.hei.tsinjo.service.DonationFormService;
 import school.hei.tsinjo.service.EventService;
 
 @Controller
@@ -20,6 +21,7 @@ public class TsinjoController {
 
   private final EventService eventService;
   private final DonationCreationFormConsumer donationCreationFormConsumer;
+  private final DonationFormService formService;
 
   @GetMapping("/")
   public String home() {
@@ -47,29 +49,11 @@ public class TsinjoController {
 
   @GetMapping("/donate")
   public String donate(Authentication authentication, Model model) {
-    var defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-    var email = defaultOAuth2User.getAttributes().get("email").toString();
 
-    var events = eventService.findAllWithPaymentResolution();
-    var thEvents = events.stream().map(ThEvent::new).toList();
+    var defaultOAUTH2User = (DefaultOAuth2User) authentication.getPrincipal();
+    var email = defaultOAUTH2User.getAttributes().get("email").toString();
 
-    var lastEvent =
-        thEvents.stream()
-            .filter(e -> e.event().getUser().getEmail().equals(email))
-            .reduce((first, second) -> second) // dernier event de l'utilisateur
-            .orElse(null);
-
-    DonationCreationForm donationForm;
-    if (lastEvent != null) {
-      donationForm =
-          new DonationCreationForm(
-              lastEvent.event().getUser().getFirstName(),
-              lastEvent.event().getUser().getLastName(),
-              "" // pspId toujours vide
-              );
-    } else {
-      donationForm = new DonationCreationForm("", "", "");
-    }
+    DonationCreationForm donationForm = formService.getPrefillDonationForm(email);
 
     model.addAttribute("donationForm", donationForm);
     return "donate";

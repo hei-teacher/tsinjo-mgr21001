@@ -11,4 +11,4 @@ public record Payment(
     String pspId,
     PaymentStatus status,
     Instant pspLastVerificationInstant,
-    Date creationInstant) {}
+    Instant creationInstant) {}

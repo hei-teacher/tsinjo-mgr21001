@@ -12,26 +12,29 @@ import school.hei.tsinjo.repository.jpa.model.JPayment;
 @Component
 public class JPaymentMapper {
   public Payment toDomain(JPayment jPayment) {
-    return switch (PspType.values()[0]) {
-      case ORANGE_MONEY ->
-          new Payment(
-              jPayment.getId(),
-              jPayment.getAmount(),
-              ORANGE_MONEY,
-              jPayment.getPspId(),
-              jPayment.getStatus(),
-              jPayment.getPspLastVerificationInstant(),
-              jPayment.getCreationInstant());
-    };
+    return new Payment(
+            jPayment.getId(),
+            jPayment.getAmount(),
+            PspType.ORANGE_MONEY, // On peut ajuster si plusieurs types
+            jPayment.getPspId(),
+            jPayment.getStatus(),
+            jPayment.getPspLastVerificationInstant(),
+            jPayment.getCreationInstant());
   }
 
   public JPayment toEntity(Payment payment) {
-    return new JPayment(
-        payment.id(),
-        payment.amount(),
-        payment.status(),
-        payment.pspId(),
-        payment.pspLastVerificationInstant(),
-        payment.creationInstant());
+    JPayment j = new JPayment(
+            payment.id(),
+            payment.amount(),
+            payment.status(),
+            payment.pspId(),
+            payment.pspLastVerificationInstant(),
+            payment.creationInstant()); // order must match allargs constructor
+
+    log.info("JPayment to persist: id={} pspId={} creationInstant={} lastVerification={}",
+            j.getId(), j.getPspId(), j.getCreationInstant(), j.getPspLastVerificationInstant());
+
+    return j;
   }
+
 }

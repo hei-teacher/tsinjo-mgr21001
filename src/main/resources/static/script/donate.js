@@ -66,16 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
         submitButton.disabled = true
     }
 
-    const mobileMenuButton = document.getElementById("mobile-menu-button")
-    if (mobileMenuButton) {
-        mobileMenuButton.addEventListener("click", toggleMobileMenu)
-    }
-
-    const mobileMenuButtons = document.querySelectorAll(".md\\:hidden.focus\\:outline-none")
+    // Gestion de tous les boutons de menu mobile
+    const mobileMenuButtons = document.querySelectorAll("header button.md\\:hidden")
     mobileMenuButtons.forEach(button => {
-        if (!button.id) {
-            button.addEventListener("click", toggleMobileMenu)
-        }
+        button.addEventListener("click", toggleMobileMenu)
     })
 
     window.addEventListener("resize", handleResize)

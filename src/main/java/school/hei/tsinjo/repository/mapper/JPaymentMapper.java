@@ -1,6 +1,5 @@
 package school.hei.tsinjo.repository.mapper;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.hei.tsinjo.model.Payment;

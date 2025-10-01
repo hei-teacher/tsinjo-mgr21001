@@ -3,9 +3,7 @@ package school.hei.tsinjo.repository.jpa.model;
 import static jakarta.persistence.EnumType.STRING;
 
 import jakarta.persistence.*;
-
 import java.time.Instant;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

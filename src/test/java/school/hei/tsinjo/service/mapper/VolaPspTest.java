@@ -19,8 +19,8 @@ public class VolaPspTest {
     String apiKey = System.getenv("VOLA_API_KEY");
 
     String tsinjoId = "tsinjo-test";
-    String pspId = "MP250904.1741.D03146";
-    String email = "mihago@mail.hei.school";
+    String pspId = "MP250805.0922.B95953";
+    String email = "ninah@mail.hei.school";
 
     VolaClient volaClient = new VolaClient(baseUrl, apiKey);
     VolaPsp volaPsp = new VolaPsp(volaClient);

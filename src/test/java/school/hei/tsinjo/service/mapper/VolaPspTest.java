@@ -1,46 +1,62 @@
 package school.hei.tsinjo.service.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import school.hei.tsinjo.model.Payment;
 import school.hei.tsinjo.model.psp.PspType;
 import school.hei.tsinjo.model.psp.vola.VolaPsp;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
+import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
 
+import java.time.Instant;
+import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+/**
+ * Simple unit test that mocks VolaClient to return a crafted Vola Payment,
+ * then verifies that VolaPsp maps pspPayment.creationInstant -> Payment.creationInstant.
+ */
 public class VolaPspTest {
 
   @Test
-  void creationInstant_should_match_between_vola_and_tsinjo() {
-
-    String baseUrl = System.getenv("VOLA_API_URL");
-    String apiKey = System.getenv("VOLA_API_KEY");
-
+  void creationInstant_should_be_mapped_from_pspPayment() {
     String tsinjoId = "tsinjo-test";
     String pspId = "MP250805.0922.B95953";
     String email = "ninah@mail.hei.school";
 
-    VolaClient volaClient = new VolaClient(baseUrl, apiKey);
+    var raw = new school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment();
+    raw.setId("vola-raw-id-1");
+
+    var psp = new PspPayment();
+    psp.setPspType(PspPayment.PspTypeEnum.ORANGE_MONEY);
+    psp.setId(pspId);
+    psp.setAmount(3000);
+    Instant expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
+    psp.setCreationInstant(Date.from(expectedPspCreation));
+
+    raw.setPspPayment(psp);
+
+    raw.setCreationInstant(Date.from(Instant.parse("2025-09-04T14:45:44.142Z")));
+    raw.setLastPspVerificationInstant(Date.from(Instant.parse("2025-09-05T08:22:02.683Z")));
+    raw.setVerificationStatus(school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum.SUCCEEDED);
+
+    VolaClient volaClient = mock(VolaClient.class);
+    when(volaClient.get(PspType.ORANGE_MONEY, pspId, email)).thenReturn(raw);
+
     VolaPsp volaPsp = new VolaPsp(volaClient);
 
-    var raw = volaClient.get(PspType.ORANGE_MONEY, pspId, email);
-    assertNotNull(raw, "Vola API returned null");
-
-    Instant rawCreation = raw.getPspPayment().getCreationInstant().toInstant();
-
     Payment mapped = volaPsp.get(tsinjoId, PspType.ORANGE_MONEY, pspId, email);
-    assertNotNull(mapped, "Mapped Payment is null");
+
+    assertNotNull(mapped, "Mapped Payment should not be null");
+    assertNotNull(mapped.creationInstant(), "Mapped creationInstant should not be null");
 
     assertEquals(
-        rawCreation,
-        mapped.creationInstant(),
-        "❌ creationInstant mismatch: raw="
-            + rawCreation
-            + " vs mapped="
-            + mapped.creationInstant());
+            expectedPspCreation,
+            mapped.creationInstant(),
+            "creationInstant must be taken from pspPayment.creationInstant when present");
 
-    System.out.println("✅ creationInstant matches: " + rawCreation);
+    assertEquals(Integer.valueOf(3000), mapped.amount(), "amount should be mapped from pspPayment.amount");
+    assertEquals(pspId, mapped.pspId(), "pspId should be mapped");
   }
 }

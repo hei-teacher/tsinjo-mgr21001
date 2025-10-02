@@ -1,5 +1,10 @@
 package school.hei.tsinjo.service.mapper;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.Instant;
+import java.util.Date;
 import org.junit.jupiter.api.Test;
 import school.hei.tsinjo.model.Payment;
 import school.hei.tsinjo.model.psp.PspType;
@@ -7,15 +12,9 @@ import school.hei.tsinjo.model.psp.vola.VolaPsp;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
 import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
 
-import java.time.Instant;
-import java.util.Date;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 /**
- * Simple unit test that mocks VolaClient to return a crafted Vola Payment,
- * then verifies that VolaPsp maps pspPayment.creationInstant -> Payment.creationInstant.
+ * Simple unit test that mocks VolaClient to return a crafted Vola Payment, then verifies that
+ * VolaPsp maps pspPayment.creationInstant -> Payment.creationInstant.
  */
 public class VolaPspTest {
 
@@ -39,7 +38,9 @@ public class VolaPspTest {
 
     raw.setCreationInstant(Date.from(Instant.parse("2025-09-04T14:45:44.142Z")));
     raw.setLastPspVerificationInstant(Date.from(Instant.parse("2025-09-05T08:22:02.683Z")));
-    raw.setVerificationStatus(school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum.SUCCEEDED);
+    raw.setVerificationStatus(
+        school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum
+            .SUCCEEDED);
 
     VolaClient volaClient = mock(VolaClient.class);
     when(volaClient.get(PspType.ORANGE_MONEY, pspId, email)).thenReturn(raw);
@@ -52,11 +53,12 @@ public class VolaPspTest {
     assertNotNull(mapped.creationInstant(), "Mapped creationInstant should not be null");
 
     assertEquals(
-            expectedPspCreation,
-            mapped.creationInstant(),
-            "creationInstant must be taken from pspPayment.creationInstant when present");
+        expectedPspCreation,
+        mapped.creationInstant(),
+        "creationInstant must be taken from pspPayment.creationInstant when present");
 
-    assertEquals(Integer.valueOf(3000), mapped.amount(), "amount should be mapped from pspPayment.amount");
+    assertEquals(
+        Integer.valueOf(3000), mapped.amount(), "amount should be mapped from pspPayment.amount");
     assertEquals(pspId, mapped.pspId(), "pspId should be mapped");
   }
 }

@@ -27,12 +27,12 @@ public class VolaPspTest {
 
     var raw = volaClient.get(PspType.ORANGE_MONEY, pspId, email);
     assertNotNull(raw, "Vola API returned null");
-
+    assertNotNull(raw.getPspPayment().getCreationInstant(), "Creation instant should not be null");
     Instant rawCreation = raw.getPspPayment().getCreationInstant().toInstant();
 
     Payment mapped = volaPsp.get(tsinjoId, PspType.ORANGE_MONEY, pspId, email);
     assertNotNull(mapped, "Mapped Payment is null");
-
+    assertNotNull(mapped.creationInstant(), "Payment creation instant mapped should not be null");
     assertEquals(
         rawCreation,
         mapped.creationInstant(),

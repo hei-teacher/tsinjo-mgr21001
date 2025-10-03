@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import school.hei.tsinjo.exception.VolaPaymentNullException;
 import school.hei.tsinjo.model.Payment;
 import school.hei.tsinjo.model.PaymentStatus;
 import school.hei.tsinjo.model.psp.Psp;
@@ -36,7 +35,7 @@ public class VolaPsp implements Psp {
       throw new IllegalArgumentException("tsinjoId cannot be null");
     }
     if (volaPayment == null) {
-      throw new VolaPaymentNullException("Vola payment is null for tsinjoId: " + tsinjoId);
+      throw new IllegalArgumentException("Vola payment is null for tsinjoId: " + tsinjoId);
     }
 
     PspPayment volaPspPayment = volaPayment.getPspPayment();

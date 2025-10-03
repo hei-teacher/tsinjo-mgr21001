@@ -12,7 +12,6 @@ import school.hei.tsinjo.model.psp.vola.VolaPsp;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
 import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
 
-
 public class VolaPspTest {
 
   @Test
@@ -31,7 +30,8 @@ public class VolaPspTest {
     assertMappedPayment(mapped, pspId);
   }
 
-  private school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment createRawPaymentWithPspPayment(String pspId) {
+  private school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment
+      createRawPaymentWithPspPayment(String pspId) {
     var raw = new school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment();
     raw.setId("vola-raw-id-1");
 

@@ -2,8 +2,12 @@ package school.hei.tsinjo.repository.jpa.model;
 
 import static jakarta.persistence.EnumType.STRING;
 
-import jakarta.persistence.*;
 import java.time.Instant;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +21,8 @@ import school.hei.tsinjo.model.PaymentStatus;
 @Getter
 @Setter
 public class JPayment {
-  @Id private String id;
+  @Id
+  private String id;
   private Integer amount;
 
   @Enumerated(STRING)

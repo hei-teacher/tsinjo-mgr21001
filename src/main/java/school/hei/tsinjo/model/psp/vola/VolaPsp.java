@@ -47,7 +47,7 @@ public class VolaPsp implements Psp {
             .orElse(null);
 
     Instant chosenCreation =
-        determineCreationInstant(volaPayment, volaPspPayment, lastVerificationInstant);
+        determineCreationInstant(volaPayment, volaPspPayment);
 
     return volaPspPayment == null ?
         new Payment(tsinjoId, null, ORANGE_MONEY, null, toPaymentStatus(volaPayment.getVerificationStatus()), lastVerificationInstant, chosenCreation) :
@@ -56,8 +56,7 @@ public class VolaPsp implements Psp {
 
   private Instant determineCreationInstant(
       school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment volaPayment,
-      PspPayment volaPspPayment,
-      Instant lastVerificationInstant) {
+      PspPayment volaPspPayment) {
     Instant pspCreation =
         Optional.ofNullable(volaPspPayment)
             .map(PspPayment::getCreationInstant)
@@ -67,13 +66,7 @@ public class VolaPsp implements Psp {
     Instant rootCreation =
         Optional.ofNullable(volaPayment.getCreationInstant()).map(Date::toInstant).orElse(null);
 
-    Instant chosenCreation = pspCreation != null ? pspCreation : rootCreation;
-
-    if (chosenCreation == null) {
-      chosenCreation = lastVerificationInstant;
-    }
-
-    return chosenCreation;
+    return pspCreation != null ? pspCreation : rootCreation;
   }
 
   private PspType toPspType(PspPayment.PspTypeEnum volaPspType) {

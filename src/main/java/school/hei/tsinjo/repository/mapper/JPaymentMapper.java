@@ -1,9 +1,10 @@
 package school.hei.tsinjo.repository.mapper;
 
+import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.hei.tsinjo.model.Payment;
-import school.hei.tsinjo.model.psp.PspType;
 import school.hei.tsinjo.repository.jpa.model.JPayment;
 
 @Slf4j
@@ -13,7 +14,7 @@ public class JPaymentMapper {
     return new Payment(
         jPayment.getId(),
         jPayment.getAmount(),
-        PspType.ORANGE_MONEY,
+        ORANGE_MONEY,
         jPayment.getPspId(),
         jPayment.getStatus(),
         jPayment.getPspLastVerificationInstant(),
@@ -21,22 +22,12 @@ public class JPaymentMapper {
   }
 
   public JPayment toEntity(Payment payment) {
-    JPayment j =
-        new JPayment(
-            payment.id(),
-            payment.amount(),
-            payment.status(),
-            payment.pspId(),
-            payment.pspLastVerificationInstant(),
-            payment.creationInstant());
-
-    log.info(
-        "JPayment to persist: id={} pspId={} creationInstant={} lastVerification={}",
-        j.getId(),
-        j.getPspId(),
-        j.getCreationInstant(),
-        j.getPspLastVerificationInstant());
-
-    return j;
+    return new JPayment(
+        payment.id(),
+        payment.amount(),
+        payment.status(),
+        payment.pspId(),
+        payment.pspLastVerificationInstant(),
+        payment.creationInstant());
   }
 }

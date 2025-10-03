@@ -13,7 +13,7 @@ public class JPaymentMapper {
     return new Payment(
         jPayment.getId(),
         jPayment.getAmount(),
-        PspType.ORANGE_MONEY, // On peut ajuster si plusieurs types
+        PspType.ORANGE_MONEY,
         jPayment.getPspId(),
         jPayment.getStatus(),
         jPayment.getPspLastVerificationInstant(),
@@ -28,7 +28,7 @@ public class JPaymentMapper {
             payment.status(),
             payment.pspId(),
             payment.pspLastVerificationInstant(),
-            payment.creationInstant()); // order must match allargs constructor
+            payment.creationInstant());
 
     log.info(
         "JPayment to persist: id={} pspId={} creationInstant={} lastVerification={}",

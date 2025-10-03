@@ -12,10 +12,7 @@ import school.hei.tsinjo.model.psp.vola.VolaPsp;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
 import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
 
-/**
- * Simple unit test that mocks VolaClient to return a crafted Vola Payment, then verifies that
- * VolaPsp maps pspPayment.creationInstant -> Payment.creationInstant.
- */
+
 public class VolaPspTest {
 
   @Test
@@ -24,16 +21,21 @@ public class VolaPspTest {
     String pspId = "MP250805.0922.B95953";
     String email = "ninah@mail.hei.school";
 
+    var rawPayment = createRawPaymentWithPspPayment(pspId);
+    VolaClient volaClient = mock(VolaClient.class);
+    when(volaClient.get(PspType.ORANGE_MONEY, pspId, email)).thenReturn(rawPayment);
+
+    VolaPsp volaPsp = new VolaPsp(volaClient);
+    Payment mapped = volaPsp.get(tsinjoId, PspType.ORANGE_MONEY, pspId, email);
+
+    assertMappedPayment(mapped, pspId);
+  }
+
+  private school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment createRawPaymentWithPspPayment(String pspId) {
     var raw = new school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment();
     raw.setId("vola-raw-id-1");
 
-    var psp = new PspPayment();
-    psp.setPspType(PspPayment.PspTypeEnum.ORANGE_MONEY);
-    psp.setId(pspId);
-    psp.setAmount(3000);
-    Instant expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
-    psp.setCreationInstant(Date.from(expectedPspCreation));
-
+    var psp = createPspPayment(pspId);
     raw.setPspPayment(psp);
 
     raw.setCreationInstant(Date.from(Instant.parse("2025-09-04T14:45:44.142Z")));
@@ -42,16 +44,24 @@ public class VolaPspTest {
         school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum
             .SUCCEEDED);
 
-    VolaClient volaClient = mock(VolaClient.class);
-    when(volaClient.get(PspType.ORANGE_MONEY, pspId, email)).thenReturn(raw);
+    return raw;
+  }
 
-    VolaPsp volaPsp = new VolaPsp(volaClient);
+  private PspPayment createPspPayment(String pspId) {
+    var psp = new PspPayment();
+    psp.setPspType(PspPayment.PspTypeEnum.ORANGE_MONEY);
+    psp.setId(pspId);
+    psp.setAmount(3000);
+    Instant expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
+    psp.setCreationInstant(Date.from(expectedPspCreation));
+    return psp;
+  }
 
-    Payment mapped = volaPsp.get(tsinjoId, PspType.ORANGE_MONEY, pspId, email);
-
+  private void assertMappedPayment(Payment mapped, String pspId) {
     assertNotNull(mapped, "Mapped Payment should not be null");
     assertNotNull(mapped.creationInstant(), "Mapped creationInstant should not be null");
 
+    Instant expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
     assertEquals(
         expectedPspCreation,
         mapped.creationInstant(),

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import school.hei.tsinjo.exception.VolaPaymentNullException;
 import school.hei.tsinjo.model.Payment;
 import school.hei.tsinjo.model.PaymentStatus;
 import school.hei.tsinjo.model.psp.Psp;
@@ -31,10 +32,11 @@ public class VolaPsp implements Psp {
 
   private Payment toPayment(
       String tsinjoId, school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment volaPayment) {
-
+    if (tsinjoId == null) {
+      throw new IllegalArgumentException("tsinjoId cannot be null");
+    }
     if (volaPayment == null) {
-      log.warn("Vola returned null for tsinjoId={}", tsinjoId);
-      return new Payment(tsinjoId, null, null, null, PaymentStatus.VERIFYING, null, null);
+      throw new VolaPaymentNullException("Vola payment is null for tsinjoId: " + tsinjoId);
     }
 
     PspPayment volaPspPayment = volaPayment.getPspPayment();
@@ -44,19 +46,7 @@ public class VolaPsp implements Psp {
             .map(Date::toInstant)
             .orElse(null);
 
-    Instant pspCreation =
-        (volaPspPayment == null)
-            ? null
-            : Optional.ofNullable(volaPspPayment.getCreationInstant())
-                .map(Date::toInstant)
-                .orElse(null);
-
-    Instant rootCreation =
-        Optional.ofNullable(volaPayment.getCreationInstant()).map(Date::toInstant).orElse(null);
-
-    Instant chosenCreation = pspCreation != null ? pspCreation : rootCreation;
-
-    if (chosenCreation == null) chosenCreation = lastVerificationInstant;
+    Instant chosenCreation = determineCreationInstant(volaPayment, volaPspPayment, lastVerificationInstant);
 
     return new Payment(
         tsinjoId,
@@ -68,8 +58,31 @@ public class VolaPsp implements Psp {
         chosenCreation);
   }
 
+  private Instant determineCreationInstant(
+      school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment volaPayment,
+      PspPayment volaPspPayment,
+      Instant lastVerificationInstant) {
+    Instant pspCreation = Optional.ofNullable(volaPspPayment)
+        .map(PspPayment::getCreationInstant)
+        .map(Date::toInstant)
+        .orElse(null);
+
+    Instant rootCreation =
+        Optional.ofNullable(volaPayment.getCreationInstant()).map(Date::toInstant).orElse(null);
+
+    Instant chosenCreation = pspCreation != null ? pspCreation : rootCreation;
+
+    if (chosenCreation == null) {
+      chosenCreation = lastVerificationInstant;
+    }
+
+    return chosenCreation;
+  }
+
   private PspType toPspType(PspPayment.PspTypeEnum volaPspType) {
-    if (volaPspType == null) return null;
+    if (volaPspType == null) {
+      return null;
+    }
     return switch (volaPspType) {
       case ORANGE_MONEY -> PspType.ORANGE_MONEY;
     };
@@ -78,7 +91,9 @@ public class VolaPsp implements Psp {
   private PaymentStatus toPaymentStatus(
       school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum
           volaPaymentStatus) {
-    if (volaPaymentStatus == null) return PaymentStatus.VERIFYING;
+    if (volaPaymentStatus == null) {
+      return PaymentStatus.VERIFYING;
+    }
     return switch (volaPaymentStatus) {
       case VERIFYING -> PaymentStatus.VERIFYING;
       case SUCCEEDED -> PaymentStatus.CONFIRMED;

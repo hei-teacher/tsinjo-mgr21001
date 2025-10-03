@@ -11,6 +11,7 @@ import school.hei.tsinjo.model.psp.Psp;
 import school.hei.tsinjo.model.psp.PspType;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
 import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
+import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
 
 @Slf4j
 @AllArgsConstructor
@@ -48,14 +49,9 @@ public class VolaPsp implements Psp {
     Instant chosenCreation =
         determineCreationInstant(volaPayment, volaPspPayment, lastVerificationInstant);
 
-    return new Payment(
-        tsinjoId,
-        (volaPspPayment == null ? null : volaPspPayment.getAmount()),
-        (volaPspPayment == null ? null : toPspType(volaPspPayment.getPspType())),
-        (volaPspPayment == null ? null : volaPspPayment.getId()),
-        toPaymentStatus(volaPayment.getVerificationStatus()),
-        lastVerificationInstant,
-        chosenCreation);
+    return volaPspPayment == null ?
+        new Payment(tsinjoId, null, ORANGE_MONEY, null, toPaymentStatus(volaPayment.getVerificationStatus()), lastVerificationInstant, chosenCreation) :
+        new Payment(tsinjoId, volaPspPayment.getAmount(), toPspType(volaPspPayment.getPspType()), volaPspPayment.getId(), toPaymentStatus(volaPayment.getVerificationStatus()), lastVerificationInstant, chosenCreation);
   }
 
   private Instant determineCreationInstant(
@@ -85,7 +81,7 @@ public class VolaPsp implements Psp {
       return null;
     }
     return switch (volaPspType) {
-      case ORANGE_MONEY -> PspType.ORANGE_MONEY;
+      case ORANGE_MONEY -> ORANGE_MONEY;
     };
   }
 

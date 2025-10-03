@@ -1,5 +1,7 @@
 package school.hei.tsinjo.model.psp.vola;
 
+import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
+
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -11,7 +13,6 @@ import school.hei.tsinjo.model.psp.Psp;
 import school.hei.tsinjo.model.psp.PspType;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
 import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
-import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
 
 @Slf4j
 @AllArgsConstructor
@@ -46,12 +47,25 @@ public class VolaPsp implements Psp {
             .map(Date::toInstant)
             .orElse(null);
 
-    Instant chosenCreation =
-        determineCreationInstant(volaPayment, volaPspPayment);
+    Instant chosenCreation = determineCreationInstant(volaPayment, volaPspPayment);
 
-    return volaPspPayment == null ?
-        new Payment(tsinjoId, null, ORANGE_MONEY, null, toPaymentStatus(volaPayment.getVerificationStatus()), lastVerificationInstant, chosenCreation) :
-        new Payment(tsinjoId, volaPspPayment.getAmount(), toPspType(volaPspPayment.getPspType()), volaPspPayment.getId(), toPaymentStatus(volaPayment.getVerificationStatus()), lastVerificationInstant, chosenCreation);
+    return volaPspPayment == null
+        ? new Payment(
+            tsinjoId,
+            null,
+            ORANGE_MONEY,
+            null,
+            toPaymentStatus(volaPayment.getVerificationStatus()),
+            lastVerificationInstant,
+            chosenCreation)
+        : new Payment(
+            tsinjoId,
+            volaPspPayment.getAmount(),
+            toPspType(volaPspPayment.getPspType()),
+            volaPspPayment.getId(),
+            toPaymentStatus(volaPayment.getVerificationStatus()),
+            lastVerificationInstant,
+            chosenCreation);
   }
 
   private Instant determineCreationInstant(

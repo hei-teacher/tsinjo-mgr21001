@@ -27,7 +27,7 @@ public class VolaPspTest {
     VolaPsp volaPsp = new VolaPsp(volaClient);
     Payment mapped = volaPsp.get(tsinjoId, PspType.ORANGE_MONEY, pspId, email);
 
-    assertMappedPayment(mapped, pspId);
+    assertPaymentMappedFromPspPayment(mapped, pspId);
   }
 
   private school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment
@@ -57,7 +57,7 @@ public class VolaPspTest {
     return psp;
   }
 
-  private void assertMappedPayment(Payment mapped, String pspId) {
+  private void assertPaymentMappedFromPspPayment(Payment mapped, String pspId) {
     assertNotNull(mapped, "Mapped Payment should not be null");
     assertNotNull(mapped.creationInstant(), "Mapped creationInstant should not be null");
 

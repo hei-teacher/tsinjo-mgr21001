@@ -2,6 +2,7 @@ package school.hei.tsinjo.service.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
 
 import java.time.Instant;
 import java.util.Date;
@@ -22,10 +23,10 @@ public class VolaPspTest {
 
     var rawPayment = createRawPaymentWithPspPayment(pspId);
     VolaClient volaClient = mock(VolaClient.class);
-    when(volaClient.get(PspType.ORANGE_MONEY, pspId, email)).thenReturn(rawPayment);
+    when(volaClient.get(ORANGE_MONEY, pspId, email)).thenReturn(rawPayment);
 
     VolaPsp volaPsp = new VolaPsp(volaClient);
-    Payment mapped = volaPsp.get(tsinjoId, PspType.ORANGE_MONEY, pspId, email);
+    Payment mapped = volaPsp.get(tsinjoId, ORANGE_MONEY, pspId, email);
 
     assertPaymentMappedFromPspPayment(mapped, pspId);
   }

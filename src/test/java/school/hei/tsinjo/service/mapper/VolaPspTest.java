@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.util.Date;
 import org.junit.jupiter.api.Test;
 import school.hei.tsinjo.model.Payment;
-import school.hei.tsinjo.model.psp.PspType;
 import school.hei.tsinjo.model.psp.vola.VolaPsp;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
 import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;

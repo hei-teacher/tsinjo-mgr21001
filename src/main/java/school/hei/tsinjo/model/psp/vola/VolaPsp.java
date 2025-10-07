@@ -47,7 +47,6 @@ public class VolaPsp implements Psp {
             .map(Date::toInstant)
             .orElse(null);
 
-    Instant chosenCreation = determineCreationInstant(volaPayment, volaPspPayment);
 
     return volaPspPayment == null
         ? new Payment(
@@ -57,7 +56,7 @@ public class VolaPsp implements Psp {
             null,
             toPaymentStatus(volaPayment.getVerificationStatus()),
             lastVerificationInstant,
-            chosenCreation)
+            volaPayment.getPspPayment().getCreationInstant().toInstant())
         : new Payment(
             tsinjoId,
             volaPspPayment.getAmount(),
@@ -65,22 +64,7 @@ public class VolaPsp implements Psp {
             volaPspPayment.getId(),
             toPaymentStatus(volaPayment.getVerificationStatus()),
             lastVerificationInstant,
-            chosenCreation);
-  }
-
-  private Instant determineCreationInstant(
-      school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment volaPayment,
-      PspPayment volaPspPayment) {
-    Instant pspCreation =
-        Optional.ofNullable(volaPspPayment)
-            .map(PspPayment::getCreationInstant)
-            .map(Date::toInstant)
-            .orElse(null);
-
-    Instant rootCreation =
-        Optional.ofNullable(volaPayment.getCreationInstant()).map(Date::toInstant).orElse(null);
-
-    return pspCreation != null ? pspCreation : rootCreation;
+            volaPayment.getPspPayment().getCreationInstant().toInstant());
   }
 
   private PspType toPspType(PspPayment.PspTypeEnum volaPspType) {

@@ -52,7 +52,7 @@ public class VolaPspTest {
     psp.setPspType(PspPayment.PspTypeEnum.ORANGE_MONEY);
     psp.setId(pspId);
     psp.setAmount(3000);
-    Instant expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
+    var expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
     psp.setCreationInstant(Date.from(expectedPspCreation));
     return psp;
   }
@@ -61,14 +61,13 @@ public class VolaPspTest {
     assertNotNull(mapped, "Mapped Payment should not be null");
     assertNotNull(mapped.creationInstant(), "Mapped creationInstant should not be null");
 
-    Instant expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
+    var expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
     assertEquals(
         expectedPspCreation,
         mapped.creationInstant(),
         "creationInstant must be taken from pspPayment.creationInstant when present");
 
-    assertEquals(
-        Integer.valueOf(3000), mapped.amount(), "amount should be mapped from pspPayment.amount");
+    assertEquals(3000, mapped.amount(), "amount should be mapped from pspPayment.amount");
     assertEquals(pspId, mapped.pspId(), "pspId should be mapped");
   }
 }

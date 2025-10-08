@@ -37,7 +37,7 @@ public class VolaPsp implements Psp {
       throw new IllegalArgumentException("Vola payment is null for tsinjoId: " + tsinjoId);
     }
 
-    PspPayment volaPspPayment = volaPayment.getPspPayment();
+    var volaPspPayment = volaPayment.getPspPayment();
 
     var lastVerificationInstant =
         volaPayment.getLastPspVerificationInstant() != null

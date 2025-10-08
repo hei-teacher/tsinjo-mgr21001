@@ -1,7 +1,9 @@
 package school.hei.tsinjo.service.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
 
 import java.time.Instant;

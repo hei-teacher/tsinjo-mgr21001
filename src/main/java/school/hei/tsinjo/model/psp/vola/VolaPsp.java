@@ -2,9 +2,6 @@ package school.hei.tsinjo.model.psp.vola;
 
 import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
 
-import java.time.Instant;
-import java.util.Date;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import school.hei.tsinjo.model.Payment;
@@ -42,40 +39,38 @@ public class VolaPsp implements Psp {
 
     PspPayment volaPspPayment = volaPayment.getPspPayment();
 
-    Instant lastVerificationInstant =
-        Optional.ofNullable(volaPayment.getLastPspVerificationInstant())
-            .map(Date::toInstant)
-            .orElse(null);
+    var lastVerificationInstant =
+        volaPayment.getLastPspVerificationInstant() != null
+            ? volaPayment.getLastPspVerificationInstant().toInstant()
+            : null;
 
-    Instant creationInstant =
-        Optional.ofNullable(volaPayment.getPspPayment())
-            .map(PspPayment::getCreationInstant)
-            .map(Date::toInstant)
-            .orElse(null);
+    var creationInstant =
+        volaPspPayment == null || volaPspPayment.getCreationInstant() == null
+            ? null
+            : volaPspPayment.getCreationInstant().toInstant();
+
+    var status = toPaymentStatus(volaPayment.getVerificationStatus());
 
     return volaPspPayment == null
-        ? new Payment(
-            tsinjoId,
-            null,
-            ORANGE_MONEY,
-            null,
-            toPaymentStatus(volaPayment.getVerificationStatus()),
-            lastVerificationInstant,
-            creationInstant)
-        : new Payment(
-            tsinjoId,
-            volaPspPayment.getAmount(),
-            toPspType(volaPspPayment.getPspType()),
-            volaPspPayment.getId(),
-            toPaymentStatus(volaPayment.getVerificationStatus()),
-            lastVerificationInstant,
-            creationInstant);
+        ? Payment.builder()
+            .id(tsinjoId)
+            .status(status)
+            .pspLastVerificationInstant(lastVerificationInstant)
+            .creationInstant(null)
+            .build()
+        : Payment.builder()
+            .id(tsinjoId)
+            .amount(volaPspPayment.getAmount())
+            .pspType(toPspType(volaPspPayment.getPspType()))
+            .pspId(volaPspPayment.getId())
+            .status(status)
+            .pspLastVerificationInstant(lastVerificationInstant)
+            .creationInstant(creationInstant)
+            .build();
   }
 
   private PspType toPspType(PspPayment.PspTypeEnum volaPspType) {
-    if (volaPspType == null) {
-      return null;
-    }
+
     return switch (volaPspType) {
       case ORANGE_MONEY -> ORANGE_MONEY;
     };
@@ -85,8 +80,9 @@ public class VolaPsp implements Psp {
       school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum
           volaPaymentStatus) {
     if (volaPaymentStatus == null) {
-      return PaymentStatus.VERIFYING;
+      return PaymentStatus.UNKNOWN;
     }
+
     return switch (volaPaymentStatus) {
       case VERIFYING -> PaymentStatus.VERIFYING;
       case SUCCEEDED -> PaymentStatus.CONFIRMED;

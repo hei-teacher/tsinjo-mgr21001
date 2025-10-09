@@ -70,7 +70,6 @@ public class VolaPsp implements Psp {
   }
 
   private PspType toPspType(PspPayment.PspTypeEnum volaPspType) {
-
     return switch (volaPspType) {
       case ORANGE_MONEY -> ORANGE_MONEY;
     };

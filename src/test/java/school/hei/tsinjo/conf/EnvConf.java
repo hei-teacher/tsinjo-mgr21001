@@ -1,7 +1,7 @@
 package school.hei.tsinjo.conf;
 
-import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.DynamicPropertyRegistry;
 
 public class EnvConf {
 
@@ -31,9 +31,7 @@ public class EnvConf {
     registry.add("casdoor.logout.url", () -> "dummy");
     registry.add("tsinjo.logout.url", () -> "dummy");
 
-    registry.add(
-        "vola.api.url",
-        () -> volaApiUrl);
+    registry.add("vola.api.url", () -> volaApiUrl);
     registry.add("vola.api.key", () -> volaApiKey);
   }
 }

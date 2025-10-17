@@ -49,6 +49,7 @@ public class SecurityConf {
         .oauth2Login(
             oauth2 ->
                 oauth2
+                    .loginPage("/oauth2/authorization/casdoor")
                     .authorizationEndpoint(
                         auth ->
                             auth.authorizationRequestResolver(

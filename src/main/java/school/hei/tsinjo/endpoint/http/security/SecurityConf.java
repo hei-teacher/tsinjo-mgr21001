@@ -1,7 +1,6 @@
 package school.hei.tsinjo.endpoint.http.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,46 +10,41 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConf {
-
-  private static final Logger log = LoggerFactory.getLogger(SecurityConf.class);
 
   private final String casdoorClientId;
   private final String casdoorLogoutUrl;
   private final String tsinjoLogoutUrl;
-  private final GeneratedStateAuthorizationRequestRepository customRepo;
-  private final DynamicStateAuthorizationRequestResolver customResolver;
+  private final Oauth2StatePaddingFixFilter statePaddingFixFilter;
 
   public SecurityConf(
       @Value("${spring.security.oauth2.client.registration.casdoor.clientid}")
           String casdoorClientId,
       @Value("${casdoor.logout.url}") String casdoorLogoutUrl,
       @Value("${tsinjo.logout.url}") String tsinjoLogoutUrl,
-      GeneratedStateAuthorizationRequestRepository customRepo,
-      DynamicStateAuthorizationRequestResolver customResolver) {
+      Oauth2StatePaddingFixFilter statePaddingFixFilter) {
     this.casdoorClientId = casdoorClientId;
     this.casdoorLogoutUrl = casdoorLogoutUrl;
     this.tsinjoLogoutUrl = tsinjoLogoutUrl;
-    this.customRepo = customRepo;
-    this.customResolver = customResolver;
+    this.statePaddingFixFilter = statePaddingFixFilter;
   }
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(Customizer.withDefaults())
         .authorizeHttpRequests(
-            authz -> authz.requestMatchers("/").permitAll().anyRequest().authenticated())
+            authorization ->
+                authorization.requestMatchers("/").permitAll().anyRequest().authenticated())
+        .addFilterBefore(statePaddingFixFilter, BasicAuthenticationFilter.class)
         .oauth2Login(
             oauth2 ->
                 oauth2
                     .loginPage("/oauth2/authorization/casdoor")
-                    .authorizationEndpoint(
-                        auth ->
-                            auth.authorizationRequestResolver(customResolver)
-                                .authorizationRequestRepository(customRepo))
                     .successHandler(
                         (request, response, authentication) -> {
                           log.info("✅ OAuth2 login SUCCESS");

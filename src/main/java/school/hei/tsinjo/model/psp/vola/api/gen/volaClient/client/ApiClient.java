@@ -202,7 +202,7 @@ public class ApiClient {
   }
 
   protected String getDefaultBaseUri() {
-    return "https://lfwt56dciff7biiy2ibilezrnm0hanrh.lambda-url.eu-west-3.on.aws";
+    return "https://localhost:8080";
   }
 
   protected HttpClient.Builder createDefaultHttpClientBuilder() {

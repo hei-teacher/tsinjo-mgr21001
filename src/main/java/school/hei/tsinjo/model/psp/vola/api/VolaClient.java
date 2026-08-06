@@ -13,7 +13,7 @@ public class VolaClient {
   public VolaClient(String baseUrl, String apiKey) {
     this.apiKey = apiKey;
     var apiClient = new ApiClient();
-    apiClient.setBasePath(baseUrl);
+    apiClient.updateBaseUri(baseUrl);
     this.paymentControllerApi = new PaymentControllerApi(apiClient);
   }
 

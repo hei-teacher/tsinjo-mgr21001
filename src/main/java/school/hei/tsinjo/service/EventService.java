@@ -33,7 +33,12 @@ public class EventService {
     var resolvedPayment = payment;
     try {
       resolvedPayment =
-          volaPsp.get(payment.id(), payment.pspType(), payment.pspId(), event.getUser().getEmail());
+          volaPsp.get(
+              payment.id(),
+              payment.pspType(),
+              payment.pspId(),
+              event.getUser().getEmail(),
+              "Tsinjo");
     } catch (Exception e) {
       log.error("Could not resolve payment for event: {}", event);
       return event;

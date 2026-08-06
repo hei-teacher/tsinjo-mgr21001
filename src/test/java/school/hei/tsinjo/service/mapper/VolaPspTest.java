@@ -24,7 +24,7 @@ public class VolaPspTest {
 
     var rawPayment = createRawPaymentWithPspPayment(pspId);
     VolaClient volaClient = mock(VolaClient.class);
-    when(volaClient.get(ORANGE_MONEY, pspId, email, "tsinjo")).thenReturn(rawPayment);
+    when(volaClient.get(ORANGE_MONEY, pspId, email, "Tsinjo")).thenReturn(rawPayment);
 
     VolaPsp volaPsp = new VolaPsp(volaClient);
     Payment mapped = volaPsp.get(tsinjoId, ORANGE_MONEY, pspId, email, "Tsinjo");

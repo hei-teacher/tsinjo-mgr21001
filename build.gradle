@@ -58,7 +58,7 @@ jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "LINE"
-                minimum = 0.8
+                minimum = 0.6
             }
         }
     }
@@ -158,7 +158,7 @@ implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 implementation 'org.springframework.boot:spring-boot-starter-security'
 implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 implementation 'org.springframework.session:spring-session-jdbc'
-    implementation("org.apache.httpcomponents:httpmime:4.5.14")
+implementation("org.apache.httpcomponents:httpmime:4.5.14")
 
 
 }

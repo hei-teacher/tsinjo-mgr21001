@@ -7,43 +7,54 @@ import static org.mockito.Mockito.when;
 import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
 
 import java.time.Instant;
-import java.util.Date;
 import org.junit.jupiter.api.Test;
 import school.hei.tsinjo.model.Payment;
 import school.hei.tsinjo.model.psp.vola.VolaPsp;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
-import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.client.ApiException;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.PspPayment;
 
 public class VolaPspTest {
 
   @Test
-  void creationInstant_should_be_mapped_from_pspPayment() {
+  void creationInstant_should_be_mapped_from_pspPayment() throws ApiException {
     String tsinjoId = "tsinjo-test";
     String pspId = "MP250805.0922.B95953";
     String email = "ninah@mail.hei.school";
 
     var rawPayment = createRawPaymentWithPspPayment(pspId);
     VolaClient volaClient = mock(VolaClient.class);
-    when(volaClient.get(ORANGE_MONEY, pspId, email)).thenReturn(rawPayment);
+    when(volaClient.get(ORANGE_MONEY, pspId, email, "Tsinjo")).thenReturn(rawPayment);
 
     VolaPsp volaPsp = new VolaPsp(volaClient);
-    Payment mapped = volaPsp.get(tsinjoId, ORANGE_MONEY, pspId, email);
+    Payment mapped = volaPsp.get(tsinjoId, ORANGE_MONEY, pspId, email, "Tsinjo");
 
     assertPaymentMappedFromPspPayment(mapped, pspId);
   }
 
-  private school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment
+  private school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment
       createRawPaymentWithPspPayment(String pspId) {
-    var raw = new school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment();
+    var raw = new school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment();
     raw.setId("vola-raw-id-1");
 
     var psp = createPspPayment(pspId);
     raw.setPspPayment(psp);
 
-    raw.setCreationInstant(Date.from(Instant.parse("2025-09-04T14:45:44.142Z")));
-    raw.setLastPspVerificationInstant(Date.from(Instant.parse("2025-09-05T08:22:02.683Z")));
+    raw.setCreationInstant(Instant.parse("2025-09-04T14:45:44.142Z"));
+    raw.setLastPspVerificationInstant(Instant.parse("2025-09-05T08:22:02.683Z"));
     raw.setVerificationStatus(
-        school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum
+        school
+            .hei
+            .tsinjo
+            .model
+            .psp
+            .vola
+            .api
+            .gen
+            .volaClient
+            .model
+            .Payment
+            .VerificationStatusEnum
             .SUCCEEDED);
 
     return raw;
@@ -55,7 +66,7 @@ public class VolaPspTest {
     psp.setId(pspId);
     psp.setAmount(3000);
     var expectedPspCreation = Instant.parse("2025-09-04T17:41:55Z");
-    psp.setCreationInstant(Date.from(expectedPspCreation));
+    psp.setCreationInstant(expectedPspCreation);
     return psp;
   }
 

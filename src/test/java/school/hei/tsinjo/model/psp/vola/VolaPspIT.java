@@ -18,7 +18,8 @@ class VolaPspIT extends FacadeIT {
             "d1b7f126-677f-4dfb-b871-87b5efcd70e7",
             ORANGE_MONEY,
             "MP250729.1216.D77954",
-            "lou@hei.school");
+            "lou@hei.school",
+            "Tsinjo");
 
     assertEquals(324_000, volaPayment.amount());
     assertEquals(CONFIRMED, volaPayment.status());

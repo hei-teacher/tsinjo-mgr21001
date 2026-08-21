@@ -6,7 +6,7 @@ import static school.hei.tsinjo.model.psp.PspType.ORANGE_MONEY;
 
 import jakarta.transaction.Transactional;
 import java.util.function.BiConsumer;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.hei.tsinjo.endpoint.http.model.DonationCreationForm;
 import school.hei.tsinjo.model.Event;
@@ -18,13 +18,25 @@ import school.hei.tsinjo.repository.PaymentRepository;
 import school.hei.tsinjo.repository.UserRepository;
 
 @Service
-@AllArgsConstructor
 public class DonationCreationFormConsumer implements BiConsumer<DonationCreationForm, String> {
   private final UserRepository userRepository;
   private final PaymentRepository paymentRepository;
   private final EventRepository eventRepository;
-
+  private final String scope;
   private final VolaPsp volaPsp;
+
+  public DonationCreationFormConsumer(
+      UserRepository userRepository,
+      PaymentRepository paymentRepository,
+      EventRepository eventRepository,
+      @Value("SCOPE") String scope,
+      VolaPsp volaPsp) {
+    this.userRepository = userRepository;
+    this.paymentRepository = paymentRepository;
+    this.eventRepository = eventRepository;
+    this.scope = scope;
+    this.volaPsp = volaPsp;
+  }
 
   @Transactional
   @Override
@@ -39,7 +51,8 @@ public class DonationCreationFormConsumer implements BiConsumer<DonationCreation
     }
 
     var paymentCreatedInVola =
-        volaPsp.create(randomUUID().toString(), pspType(), donationCreationForm.pspId(), email);
+        volaPsp.create(
+            randomUUID().toString(), pspType(), donationCreationForm.pspId(), email, scope);
     var payment = paymentRepository.save(paymentCreatedInVola);
     var user = userFrom(donationCreationForm, email);
     eventRepository.save(Event.from(randomUUID().toString(), payment, user, now(), ""));

@@ -39,7 +39,11 @@ public class SecurityConf {
     http.csrf(Customizer.withDefaults())
         .authorizeHttpRequests(
             authorization ->
-                authorization.requestMatchers("/").permitAll().anyRequest().authenticated())
+                authorization
+                    .requestMatchers("/", "/ping")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .addFilterBefore(statePaddingFixFilter, BasicAuthenticationFilter.class)
         .oauth2Login(
             oauth2 ->

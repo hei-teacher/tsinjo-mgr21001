@@ -8,9 +8,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static school.hei.tsinjo.model.PaymentStatus.CONFIRMED;
-import static school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum.SUCCEEDED;
-import static school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum.VERIFYING;
-import static school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment.PspTypeEnum.ORANGE_MONEY;
+import static school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment.VerificationStatusEnum.SUCCEEDED;
+import static school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment.VerificationStatusEnum.VERIFYING;
+import static school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.PspPayment.PspTypeEnum.ORANGE_MONEY;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -21,9 +21,10 @@ import school.hei.tsinjo.conf.FacadeIT;
 import school.hei.tsinjo.endpoint.http.model.DonationCreationForm;
 import school.hei.tsinjo.model.PaymentStatus;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
-import school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment;
-import school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum;
-import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.client.ApiException;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment.VerificationStatusEnum;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.PspPayment;
 
 class EventServiceIT extends FacadeIT {
   @Autowired DonationCreationFormConsumer donationCreationFormConsumer;
@@ -37,23 +38,24 @@ class EventServiceIT extends FacadeIT {
   @Transactional
   @Rollback
   @Test
-  void create_then_confirm() {
+  void create_then_confirm() throws ApiException {
     var ref1 = generateValidPspId();
     var newEmail = randomUUID() + "@cute.dev";
 
     var verifyingVolaPayment = aVolaPayment(VERIFYING);
-    when(volaClientMock.create(any(), eq(ref1), eq(newEmail))).thenReturn(verifyingVolaPayment);
+    when(volaClientMock.create(any(), eq(ref1), eq(newEmail), any(String.class)))
+        .thenReturn(verifyingVolaPayment);
     donationCreationFormConsumer.accept(new DonationCreationForm("Lou", "Andria", ref1), newEmail);
 
     // Just after creation, we simulate that Vola still replies with VERIFYING
-    when(volaClientMock.get(any(), any(), any())).thenReturn(verifyingVolaPayment);
+    when(volaClientMock.get(any(), any(), any(), any())).thenReturn(verifyingVolaPayment);
     var events = eventService.findAllWithPaymentResolution();
     assertTrue(events.size() == 4 || events.size() == 1);
     assertEquals(PaymentStatus.VERIFYING, events.get(0).getPayment().status());
 
     // Now we simulate Vola replies with SUCCEEDED
     var succeededVolaPayment = aVolaPayment(SUCCEEDED);
-    when(volaClientMock.get(any(), any(), any())).thenReturn(succeededVolaPayment);
+    when(volaClientMock.get(any(), any(), any(), any())).thenReturn(succeededVolaPayment);
     events = eventService.findAllWithPaymentResolution();
     assertTrue(events.size() == 4 || events.size() == 1);
     assertEquals(CONFIRMED, events.get(0).getPayment().status());

@@ -9,7 +9,8 @@ import school.hei.tsinjo.model.PaymentStatus;
 import school.hei.tsinjo.model.psp.Psp;
 import school.hei.tsinjo.model.psp.PspType;
 import school.hei.tsinjo.model.psp.vola.api.VolaClient;
-import school.hei.tsinjo.model.psp.vola.api.gen.client.model.PspPayment;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.client.ApiException;
+import school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.PspPayment;
 
 @Slf4j
 @AllArgsConstructor
@@ -17,19 +18,31 @@ public class VolaPsp implements Psp {
   private final VolaClient volaClient;
 
   @Override
-  public Payment create(String tsinjoId, PspType pspType, String pspId, String email) {
-    var volaPayment = volaClient.create(pspType, pspId, email);
+  public Payment create(
+      String tsinjoId, PspType pspType, String pspId, String email, String scope) {
+    school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment volaPayment = null;
+    try {
+      volaPayment = volaClient.create(pspType, pspId, email, scope);
+    } catch (ApiException e) {
+      throw new RuntimeException(e);
+    }
     return toPayment(tsinjoId, volaPayment);
   }
 
   @Override
-  public Payment get(String tsinjoId, PspType pspType, String pspId, String email) {
-    var volaPayment = volaClient.get(pspType, pspId, email);
+  public Payment get(String tsinjoId, PspType pspType, String pspId, String email, String scope) {
+    school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment volaPayment = null;
+    try {
+      volaPayment = volaClient.get(pspType, pspId, email, scope);
+    } catch (ApiException e) {
+      throw new RuntimeException(e);
+    }
     return toPayment(tsinjoId, volaPayment);
   }
 
   private Payment toPayment(
-      String tsinjoId, school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment volaPayment) {
+      String tsinjoId,
+      school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment volaPayment) {
     if (tsinjoId == null) {
       throw new IllegalArgumentException("tsinjoId cannot be null");
     }
@@ -41,13 +54,13 @@ public class VolaPsp implements Psp {
 
     var lastVerificationInstant =
         volaPayment.getLastPspVerificationInstant() != null
-            ? volaPayment.getLastPspVerificationInstant().toInstant()
+            ? volaPayment.getLastPspVerificationInstant()
             : null;
 
     var creationInstant =
         volaPspPayment == null || volaPspPayment.getCreationInstant() == null
             ? null
-            : volaPspPayment.getCreationInstant().toInstant();
+            : volaPspPayment.getCreationInstant();
 
     var status = toPaymentStatus(volaPayment.getVerificationStatus());
 
@@ -76,7 +89,7 @@ public class VolaPsp implements Psp {
   }
 
   private PaymentStatus toPaymentStatus(
-      school.hei.tsinjo.model.psp.vola.api.gen.client.model.Payment.VerificationStatusEnum
+      school.hei.tsinjo.model.psp.vola.api.gen.volaClient.model.Payment.VerificationStatusEnum
           volaPaymentStatus) {
     if (volaPaymentStatus == null) {
       return PaymentStatus.UNKNOWN;

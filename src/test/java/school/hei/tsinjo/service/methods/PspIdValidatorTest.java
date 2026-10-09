@@ -7,7 +7,7 @@ import school.hei.tsinjo.service.DonationCreationFormConsumer;
 
 public class PspIdValidatorTest {
   private final DonationCreationFormConsumer consumer =
-      new DonationCreationFormConsumer(null, null, null, null);
+      new DonationCreationFormConsumer(null, null, null, null, null);
 
   @Test
   void validPspIds_shouldReturnTrue() {

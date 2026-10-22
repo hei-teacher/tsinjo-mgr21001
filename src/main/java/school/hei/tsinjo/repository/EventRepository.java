@@ -28,4 +28,8 @@ public class EventRepository {
         .map(jEventMapper::toDomain)
         .toList();
   }
+
+  public long countNonNegative() {
+    return jEventRepository.countByPaymentAmountGreaterThanEqual(0);
+  }
 }

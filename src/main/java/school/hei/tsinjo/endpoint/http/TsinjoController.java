@@ -40,6 +40,7 @@ public class TsinjoController {
     int toIndex = Math.min(fromIndex + size, total);
     var pagedEvents = thEvents.subList(fromIndex, toIndex);
     model.addAttribute("events", pagedEvents);
+    model.addAttribute("donationTotal", eventService.countNonNegative());
     model.addAttribute("fund", new ThFund(events));
     model.addAttribute("currentPage", page);
     model.addAttribute("totalPages", (int) Math.ceil((double) total / size));

@@ -31,6 +31,10 @@ public class EventService {
         .toList();
   }
 
+  public long countNonNegative() {
+    return eventRepository.countNonNegative();
+  }
+
   private Event resolvePayment(Event event) {
     var payment = event.getPayment();
     if (!VERIFYING.equals(payment.status())) {

@@ -18,7 +18,7 @@ public abstract sealed class Event permits Donation, Help {
   public static Event from(
       String id, Payment payment, User user, Instant creationInstant, String comment) {
     return payment.amount() == null || payment.amount() >= 0
-        ? new Donation(id, payment, user, creationInstant)
+        ? new Donation(id, payment, user, creationInstant, comment)
         : new Help(id, payment, user, creationInstant, comment);
   }
 

@@ -16,7 +16,7 @@
 <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6 max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6 max-w-4xl mx-auto">
         <div class="bg-white rounded-lg shadow-sm p-4 hover:shadow transition flex flex-col justify-center items-center">
             <h3 class="text-[#16163f] font-semibold text-sm sm:text-base lg:text-lg text-center">Donations Confirmées</h3>
             <p class="text-lg sm:text-xl font-extrabold text-[#9933cc] mt-1"
@@ -31,6 +31,10 @@
             <h3 class="text-[#16163f] font-semibold text-sm sm:text-base lg:text-lg text-center">Fonds Restants</h3>
             <p class="text-lg sm:text-xl font-extrabold text-[#9933cc] mt-1"
                th:text="${fund.confirmedRemainingFund != null ? #numbers.formatInteger(fund.confirmedRemainingFund, 0, 'COMMA') + ' Ar' : '--'}">0 Ar</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-4 hover:shadow transition flex flex-col justify-center items-center">
+            <h3 class="text-[#16163f] font-semibold text-sm sm:text-base lg:text-lg text-center">Nombre de Donations</h3>
+            <p class="text-lg sm:text-xl font-extrabold text-[#9933cc] mt-1" th:text="${donationTotal}">0</p>
         </div>
     </div>
 

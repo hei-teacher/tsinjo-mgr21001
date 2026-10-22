@@ -8,4 +8,6 @@ import school.hei.tsinjo.repository.jpa.model.JEvent;
 @Repository
 public interface JEventRepository extends JpaRepository<JEvent, String> {
   List<JEvent> findAllByOrderByCreationInstantDesc();
+
+  long countByPaymentAmountGreaterThanEqual(int amount);
 }
